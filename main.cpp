@@ -1,112 +1,74 @@
+// Pines de componentes
+const int pinLEDs[3] = {11, 10, 9};       // Rojo, Verde, Azul
+const int pinBotones[3] = {4, 3, 2};      // Rojo, Verde, Azul
+const int tonos[3] = {261, 329, 392};     
+const int pinBuzzer = 8;
 
-
-const uint8_t pinLeds[3] = {11, 10, 9};   
-const uint8_t pinBuzzer = 8;
-const uint8_t pinBotones[3] = {4, 3, 2};  
-
-const uint16_t tonosLeds[3] = {262, 330, 392}; 
-const uint16_t tonoExito = 523;
-const uint16_t tonoError = 130;
-
-const uint8_t MAX_NIVEL = 30;
-uint8_t secuencia[MAX_NIVEL];
-uint8_t nivelActual = 1;
+int secuencia[100];
+int nivel = 0;
 
 void setup() {
-  for (uint8_t i = 0; i < 3; i++) {
-    pinMode(pinLeds[i], OUTPUT);
+  for (int i = 0; i < 3; i++) {
+    pinMode(pinLEDs[i], OUTPUT);
     pinMode(pinBotones[i], INPUT_PULLUP);
-    digitalWrite(pinLeds[i], LOW);
   }
   pinMode(pinBuzzer, OUTPUT);
-  noTone(pinBuzzer);
   randomSeed(analogRead(A0));
-  delay(1000);
 }
 
 void loop() {
-  generarSecuencia();
-  reproducirSecuencia();
+  
+  secuencia[nivel] = random(0, 3);
+  nivel++;
 
-  if (obtenerRespuestaJugador()) {
-    secuenciaExito();
-    nivelActual++;
-    delay(800);
-  } else {
-    secuenciaError();
-    nivelActual = 1;
-    delay(1000);
+
+  for (int i = 0; i < nivel; i++) {
+    int color = secuencia[i];
+    digitalWrite(pinLEDs[color], HIGH);
+    tone(pinBuzzer, tonos[color], 300);
+    delay(400);
+    digitalWrite(pinLEDs[color], LOW);
+    delay(200);
   }
-}
 
-void generarSecuencia() {
-  secuencia[nivelActual - 1] = random(0, 3);
-}
 
-void reproducirSecuencia() {
-  delay(500);
-  for (uint8_t i = 0; i < nivelActual; i++) {
-    uint8_t color = secuencia[i];
-    activarSalida(color, 350);
-    delay(150);
-  }
-}
+  for (int i = 0; i < nivel; i++) {
+    int botonPresionado = esperarBoton();
 
-void activarSalida(uint8_t indice, uint16_t duracion) {
-  digitalWrite(pinLeds[indice], HIGH);
-  tone(pinBuzzer, tonosLeds[indice]);
-  delay(duracion);
-  noTone(pinBuzzer);
-  digitalWrite(pinLeds[indice], LOW);
-}
-
-bool obtenerRespuestaJugador() {
-  for (uint8_t paso = 0; paso < nivelActual; paso++) {
-    int botonPresionado = esperarPulsacion();
-    if (botonPresionado != secuencia[paso]) {
-      return false;
+   
+    if (botonPresionado != secuencia[i]) {
+      secuenciaError();
+      nivel = 0; // Reinicia el juego
+      delay(1000);
+      return;
     }
   }
-  return true;
+
+
+  delay(800);
 }
 
-int esperarPulsacion() {
+int esperarBoton() {
   while (true) {
-    for (uint8_t i = 0; i < 3; i++) {
-      if (digitalRead(pinBotones[i]) == LOW) {
-        delay(30); // Antirrebote basico
-        if (digitalRead(pinBotones[i]) == LOW) {
-          // Enciende luz y sonido mientras se presiona
-          digitalWrite(pinLeds[i], HIGH);
-          tone(pinBuzzer, tonosLeds[i]);
-      
-          while (digitalRead(pinBotones[i]) == LOW);
-        
-          noTone(pinBuzzer);
-          digitalWrite(pinLeds[i], LOW);
-          delay(50); 
-          return i;
-        }
+    for (int i = 0; i < 3; i++) {
+      if (digitalRead(pinBotones[i]) == LOW) { 
+        digitalWrite(pinLEDs[i], HIGH);
+        tone(pinBuzzer, tonos[i], 200);
+        delay(250);
+        digitalWrite(pinLEDs[i], LOW);
+
+       
+        while (digitalRead(pinBotones[i]) == LOW);
+        delay(50);
+        return i;
       }
     }
   }
 }
 
-void secuenciaExito() {
-  tone(pinBuzzer, tonoExito);
-  delay(200);
-  noTone(pinBuzzer);
-  delay(50);
-  tone(pinBuzzer, (uint16_t)(tonoExito * 1.25));
-  delay(300);
-  noTone(pinBuzzer);
-}
-
 void secuenciaError() {
-  tone(pinBuzzer, tonoError);
-  for (uint8_t i = 0; i < 3; i++) digitalWrite(pinLeds[i], HIGH);
+  tone(pinBuzzer, 130, 600); // Tono grave de error
+  for (int i = 0; i < 3; i++) digitalWrite(pinLEDs[i], HIGH);
   delay(600);
-  noTone(pinBuzzer);
-  for (uint8_t i = 0; i < 3; i++) digitalWrite(pinLeds[i], LOW);
-  delay(300);
+  for (int i = 0; i < 3; i++) digitalWrite(pinLEDs[i], LOW);
 }
