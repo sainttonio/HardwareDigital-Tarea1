@@ -1,13 +1,10 @@
-/*
- * Tarea 1: Entradas y Salidas Digitales - Juego "Simón Dice"
- * Hardware Digital (CIN-212) - Universidad de Valparaíso
- */
 
-const uint8_t pinLeds[3] = {11, 10, 9};    // Rojo, Verde, Azul
+
+const uint8_t pinLeds[3] = {11, 10, 9};   
 const uint8_t pinBuzzer = 8;
-const uint8_t pinBotones[3] = {4, 3, 2};  // Rojo (4), Verde (3), Azul (2)
+const uint8_t pinBotones[3] = {4, 3, 2};  
 
-const uint16_t tonosLeds[3] = {262, 330, 392}; // Do, Mi, Sol
+const uint16_t tonosLeds[3] = {262, 330, 392}; 
 const uint16_t tonoExito = 523;
 const uint16_t tonoError = 130;
 
@@ -79,14 +76,12 @@ int esperarPulsacion() {
       if (digitalRead(pinBotones[i]) == LOW) {
         delay(30); // Antirrebote basico
         if (digitalRead(pinBotones[i]) == LOW) {
-          // Enciende luz y tono mientras se presiona
+          // Enciende luz y sonido mientras se presiona
           digitalWrite(pinLeds[i], HIGH);
           tone(pinBuzzer, tonosLeds[i]);
-          
-          // Espera a que se suelte el boton
+      
           while (digitalRead(pinBotones[i]) == LOW);
-          
-          // Apaga sonido e iluminacion de inmediato
+        
           noTone(pinBuzzer);
           digitalWrite(pinLeds[i], LOW);
           delay(50); 
