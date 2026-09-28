@@ -11,7 +11,7 @@
 
 ## 📋 Descripción del Proyecto
 
-Este proyecto consiste en la implementación y simulación de un juego interactivo de memoria del tipo **"Simón Dice"** utilizando la plataforma **Arduino UNO R3**. 
+Este proyecto consiste en la implementación y simulación de un juego interactivo de memoria utilizando la plataforma **Arduino UNO R3**. 
 
 El sistema genera secuencias aleatorias de luces y tonos sonoros mediante LEDs y un zumbador piezoeléctrico. El jugador debe memorizar y replicar la secuencia utilizando tres pulsadores configurados con resistencia interna de pull-up (`INPUT_PULLUP`) y filtrado por software contra rebotes de contactos (*debouncing*).
 
